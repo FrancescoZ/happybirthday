@@ -17,7 +17,7 @@ app.get('/home',function(req,res){
     res.redirect('/home/'+id);
 });
 app.get('/', function(req, res){
-	
+	res.render('index');
 });
 
 var server = http.createServer(app);

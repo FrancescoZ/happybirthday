@@ -3,11 +3,6 @@
     "version": "0.0.1",
     "description": "sample video and image uploader",
     "main": "app.js",
-    "keywords": [
-        "system",
-        "real",
-        "time"
-    ],
     "author": "Francesco Zanoli",
     "license": "MIT",
     "dependencies": {
