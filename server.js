@@ -3,7 +3,7 @@ var fs = require('fs');
 // Start Binary.js server
 var BinaryServer = require('binaryjs').BinaryServer;
 
-module.exports = function(app, io){
+module.exports = function(app, server){
   var bs = BinaryServer({server: server});
   // Wait for new user connections
   bs.on('connection', function(client){

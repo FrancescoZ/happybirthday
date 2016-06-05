@@ -18,27 +18,22 @@
   <h1>Horizontal Responsive Form</h1>
   
   <form onsubmit="return false">
-  <div class="col-2">
-    <label>
-      Name
-      <input placeholder="What is your full name?" id="name" name="name" tabindex="1">
-    </label>
-  </div>
-  
-  
   <div class="col-4">
     <label>
-      Message
-      <input placeholder="Messaggio opzionale per gio" id="skills" name="skills" tabindex="6">
+      Nome
+      <input placeholder="Nome e Cognome" name="name" tabindex="1">
+    </label>
+  </div>  
+  <div class="col-5">
+    <label>
+      Messaggio 
+      <input placeholder="Messaggio opzionale per gio" id="skills" name="messaggio" tabindex="2">
     </label>
   </div>
-  <div class="col-4">
+  <div class="col">
     <label>
       Video o foto
-      <div id="progress" align="center">0% complete</div>
-      <div id="box" style="background: #eee; font-size: 26px; width: 400px; height: 300px;line-height: 300px; margin: 0 auto; text-align: center;">
-        Connecting...
-      </div>
+      <input type="file" id="box" name="video" tabindex="3" placeholder="Aggiungi una foto o un video">
     </label>
   </div>
   <div class="col-submit">
