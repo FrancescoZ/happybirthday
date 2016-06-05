@@ -7,7 +7,7 @@ var express = require('express'),
 	http = require('http');
 
 //pour pouvoir lancer l'app sur un serveur inligne
-var port = process.env.app_port || 8080;
+var port = process.env.app_port || 80;
 
 app.set('view engine', 'html');
 app.engine('html', require('ejs').renderFile);

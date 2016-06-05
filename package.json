@@ -6,7 +6,7 @@
     "author": "Francesco Zanoli",
     "license": "MIT",
     "scripts": {
-        "start": "node start.js"
+        "start": "node app.js"
     },
     "dependencies": {
         "ejs": "^1.0.0",
