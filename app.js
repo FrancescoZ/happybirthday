@@ -1,43 +1,29 @@
-const http         = require('http'),
-      fs           = require('fs'),
-      path         = require('path'),
-      contentTypes = require('./utils/content-types'),
-      sysInfo      = require('./utils/sys-info'),
-      env          = process.env;
+//pour pouvoir lancer l'application il faut appeler ce ficher
+//on utilise le module express et socketIO (voir le rapport pour connaitre les raisons)
+var express = require('express'),
+	app = express(),
+	path = require ('path');
 
-let server = http.createServer(function (req, res) {
-  let url = req.url;
-  if (url == '/') {
-    url += 'index.html';
-  }
+//pour pouvoir lancer l'app sur un serveur inligne
+var port = process.env.app_port || 8080;
 
-  // IMPORTANT: Your application HAS to respond to GET /health with status 200
-  //            for OpenShift health monitoring
-
-  if (url == '/health') {
-    res.writeHead(200);
-    res.end();
-  } else if (url.indexOf('/info/') == 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Cache-Control', 'no-cache, no-store');
-    res.end(JSON.stringify(sysInfo[url.slice(6)]()));
-  } else {
-    fs.readFile('./static' + url, function (err, data) {
-      if (err) {
-        res.writeHead(404);
-        res.end();
-      } else {
-        let ext = path.extname(url).slice(1);
-        res.setHeader('Content-Type', contentTypes[ext]);
-        if (ext === 'html') {
-          res.setHeader('Cache-Control', 'no-cache, no-store');
-        }
-        res.end(data);
-      }
-    });
-  }
+app.set('view engine', 'html');
+app.engine('html', require('ejs').renderFile);
+app.set('views', __dirname + '/static/views');
+app.use(express.static(path.join(__dirname + '/static')));
+app.get('/home',function(req,res){
+	// Generate unique id for the room
+	var id = Math.round((Math.random() * 1000000));
+    res.redirect('/home/'+id);
+});
+app.get('/', function(req, res){
+	
 });
 
-server.listen(env.NODE_PORT || 3000, env.NODE_IP || 'localhost', function () {
-  console.log(`Application worker ${process.pid} started...`);
-});
+var server = http.createServer(app);
+
+
+require('./server')(app, server);
+
+server.listen(port);
+console.log('Your application is running');

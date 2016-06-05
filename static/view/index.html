@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html">
+  <title>Horizontal Application Form - Template Monster Demo</title>
+  <meta name="author" content="Jake Rocheleau">
+  <link rel="shortcut icon" href="http://static.tmimgcdn.com/img/favicon.ico">
+  <link rel="icon" href="http://static.tmimgcdn.com/img/favicon.ico">
+  <link rel="stylesheet" type="text/css" media="all" href="css/styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/switchery.min.css">
+  <script type="text/javascript" src="js/switchery.min.js"></script>
+</head>
+
+<body>
+  <div id="wrapper">
+  
+  <h1>Horizontal Responsive Form</h1>
+  
+  <form onsubmit="return false">
+  <div class="col-2">
+    <label>
+      Name
+      <input placeholder="What is your full name?" id="name" name="name" tabindex="1">
+    </label>
+  </div>
+  
+  
+  <div class="col-4">
+    <label>
+      Message
+      <input placeholder="Messaggio opzionale per gio" id="skills" name="skills" tabindex="6">
+    </label>
+  </div>
+  <div class="col-4">
+    <label>
+      Video o foto
+      <div id="progress" align="center">0% complete</div>
+      <div id="box" style="background: #eee; font-size: 26px; width: 400px; height: 300px;line-height: 300px; margin: 0 auto; text-align: center;">
+        Connecting...
+      </div>
+    </label>
+  </div>
+  <div class="col-submit">
+    <button class="submitbtn">Submit Form</button>
+  </div>
+  
+  </form>
+  </div>
+<script type="text/javascript">
+var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+
+elems.forEach(function(html) {
+  var switchery = new Switchery(html);
+});
+</script>
+<script>
+    var client = new BinaryClient('ws://localhost:8080');
+    
+    // Wait for connection to BinaryJS server
+    client.on('open', function(){
+      var box = $('#box');
+      box.on('dragenter', doNothing);
+      box.on('dragover', doNothing);
+      box.text('Drag files here');
+      box.on('drop', function(e){
+        e.originalEvent.preventDefault();
+        var file = e.originalEvent.dataTransfer.files[0];
+        
+        // Add to list of uploaded files
+        $('<div align="center"></div>').append($('<a></a>').text(file.name).prop('href', '/'+file.name)).appendTo('body');
+        
+        // `client.send` is a helper function that creates a stream with the 
+        // given metadata, and then chunks up and streams the data.
+        var stream = client.send(file, {name: file.name, size: file.size});
+        
+        // Print progress
+        var tx = 0;
+        stream.on('data', function(data){
+          $('#progress').text(Math.round(tx+=data.rx*100) + '% complete');
+        });
+      }); 
+    });
+    
+    // Deal with DOM quirks
+    function doNothing (e){
+      e.preventDefault();
+      e.stopPropagation();
+    }
+ </script>
+</body>
+</html>
