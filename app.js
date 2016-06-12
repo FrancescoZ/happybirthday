@@ -9,7 +9,7 @@ var express = require('express'),
 var url = require('url');
 
 //pour pouvoir lancer l'app sur un serveur inligne
-var port = process.env.app_port || 8080;
+var port = process.env.app_port || 3010;
 
 var io = require('socket.io').listen(app.listen(port, function () {
     console.log("Working");
