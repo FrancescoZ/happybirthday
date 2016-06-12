@@ -60,7 +60,7 @@ app.get('/:id', function (req, res) {
 var multer = require('multer');
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, 'static/uploads/');
+        callback(null, './static/uploads/');
     },
     filename: function (req, file, callback) {
         callback(null, file.fieldname +getID()+ '-' + Date.now() + path.extname(file.originalname));
