@@ -7,13 +7,14 @@ var express = require('express'),
     http = require('http');
 var url = require('url');
 var db= require('mysql');
-var pool      =    db.createPool({
+var pool      =    db.createConnection({
     connectionLimit : 100, //important
-    host     : 'localhost:3306',
+    host     : 'localhost',
     user     : 'francescozano',
     password : 'W1QP9bTZgNbyIEQW',
     database : 'francescozano',
-    debug    :  false
+    debug    :  false,
+    port: 3306,
 });
 
 
@@ -32,21 +33,11 @@ var getID=function(){
 };
 
 var ask=function(query,callback){
-    pool.getConnection(function(err,connection){
-        if (err) {
-            if(connection)
-              connection.release();
-          return;
+    pool.query(query,function(err,rows){
+        if(!err) {
+            if (callback)
+                callback(rows);
         }
-        connection.query(query,function(err,rows){
-            connection.release();
-            if(!err) {
-                if (callback)
-                    callback(rows);
-            }
-        });
-        connection.on('error', function(err) {
-        });
     });
 }
 
@@ -69,7 +60,7 @@ app.get('/:id', function (req, res) {
 var multer = require('multer');
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, 'static/uploads');
+        callback(null, 'static/uploads/');
     },
     filename: function (req, file, callback) {
         callback(null, file.fieldname +getID()+ '-' + Date.now() + path.extname(file.originalname));
@@ -82,7 +73,8 @@ app.post('/photo', function (req, res) {
         if (err) {
             return res.end("C'è stato un errore nel caricamento, ricarica la pagina e riprova");
         }
-        try {         
+        try {
+            var id = getID();
             var name = res.req.body.name,
                 message = res.req.body.messaggio,
                 files = res.req.files;
@@ -110,14 +102,14 @@ var indexPage, movie_webm, movie_mp4, movie_ogg;
 
 io.on('connection', function (socket) {
     socket.on('home',function(){
-        ask("SELECT * FROM message;",function(err,row){
-            if (err)
-                return;
+        ask("SELECT * FROM message;",function(rows){
+            var row=rows[0];
+            var name=row.name;
             var image="";
             if (row.clicked==1 && row.image!=null)
                 image="images/"+row.id+".jpg";
             else
-                image=require('gravatar').url(row.name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
+                image=require('gravatar').url(name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
             socket.emit('person',{
                 name:row.name,
                 id:row.id,
@@ -128,43 +120,40 @@ io.on('connection', function (socket) {
         
     });
     socket.on('load',function(data){
+        var id=data;
+        ask("UPDATE message SET clicked=1 WHERE id='"+id+"';");
+        ask("SELECT * FROM message WHERE id='"+id+"';",function(rows){
+            var row=rows[0];
+            var image="images/"+row.id+".jpg";
+            if (row.image==null)
+                image=require('gravatar').url(row.name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
 
-            ask("UPDATE message SET clicked=1 WHERE id='"+id+"';");
-            ask("SELECT * FROM message WHERE id='"+id+"';",function(err,row){
-                if (err)
-                    return;
-                var image="images/"+row.id+".jpg";
-                if (row.image==null)
-                    image=require('gravatar').url(row.name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
-
-                socket.emit('friend',{
-                    name:row.name,
-                    id:row.id,
-                    image:image,
-                    message:row.message,
-                    time:row.timestap
-                });
-                
-                ask("SELECT * FROM attached WHERE message='"+id+"';",function(err,imgs){
-                    imgs.forEach(function (img) {
-                        if (err)
-                            return;
-                        if (img.type=="image")
-                            var signal='image';
-                        else if (img.type=='video')
-                            var signal='video';
-                        socket.emit(signal,{
-                            name:row.name,
-                            id:row.id,
-                            image:image,
-                            source:img.path,
-                            time:row.timestap
-                        });
+            socket.emit('friend',{
+                name:row.name,
+                id:row.id,
+                image:image,
+                message:row.message,
+                time:row.timestap
+            });
+            
+            ask("SELECT * FROM attached WHERE message='"+id+"';",function(imgs){
+                imgs.forEach(function (img) {
+                    if (img.type=="image")
+                        var signal='image';
+                    else if (img.type=='video')
+                        var signal='video';
+                    socket.emit(signal,{
+                        name:row.name,
+                        id:row.id,
+                        image:image,
+                        source:img.path,
+                        time:row.timestap
                     });
                 });
             });
-                
         });
+            
     });
+});
 
 
