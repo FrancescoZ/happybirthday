@@ -159,13 +159,12 @@ io.on('connection', function (socket) {
                             image:image,
                             source:img.path,
                             time:row.timestap
-                        })
-                    };
+                        });
+                    });
                 });
             });
                 
         });
     });
 
-});
 
