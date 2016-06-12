@@ -1,12 +1,21 @@
 //pour pouvoir lancer l'application il faut appeler ce ficher
 //on utilise le module express et socketIO (voir le rapport pour connaitre les raisons)
 var express = require('express'),
-    sql=require('sqlite3'),
     app = express(),
     path = require('path'),
     fs = require('fs'),
     http = require('http');
 var url = require('url');
+var db= require('mysql');
+var pool      =    db.createPool({
+    connectionLimit : 100, //important
+    host     : 'localhost:3306',
+    user     : 'francescozano',
+    password : 'W1QP9bTZgNbyIEQW',
+    database : 'francescozano',
+    debug    :  false
+});
+
 
 //pour pouvoir lancer l'app sur un serveur inligne
 var port = process.env.app_port || 3010;
@@ -22,7 +31,24 @@ var getID=function(){
     return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 };
 
-//
+var ask=function(query,callback){
+    pool.getConnection(function(err,connection){
+        if (err) {
+            if(connection)
+              connection.release();
+          return;
+        }
+        connection.query(query,function(err,rows){
+            connection.release();
+            if(!err) {
+                if (callback)
+                    callback(rows);
+            }
+        });
+        connection.on('error', function(err) {
+        });
+    });
+}
 
 app.set('view engine', 'html');
 app.engine('html', require('ejs').renderFile);
@@ -56,28 +82,21 @@ app.post('/photo', function (req, res) {
         if (err) {
             return res.end("C'è stato un errore nel caricamento, ricarica la pagina e riprova");
         }
-        try {
-            var sqlite3 = sql.verbose();
-            var db = new sqlite3.Database('database.db');
-            var id = getID();
-            name = res.req.body.name,
+        try {         
+            var name = res.req.body.name,
                 message = res.req.body.messaggio,
                 files = res.req.files;
-            db.serialize(function () {
-
-                db.run("INSERT INTO message (id,name,message,time) VALUES ('" + id + "','" + name + "','" + message + "','"+(new Date()).getHours()+":"+(new Date()).getMinutes()+"')");
-                // stmt.run();
-                // stmt.finalize();
-                var i=0;
-                files.forEach(function (file) {
-                    if (i>=5)
-                        return;
-                    var idfile = getID();
-                    db.run("INSERT INTO attached (id,path,message,type) VALUES ('" + idfile + "','" + file.path.replace('static\\','') + "','" + id + "','"+file.mimetype.split("/")[0]+"')");
-                    i++;
-                });
-            });
-            db.close();
+            ask("INSERT INTO message (id,name,message,timestap) VALUES ('" + id + "','" + name + "','" + message + "','"+(new Date()).getHours()+":"+(new Date()).getMinutes()+"')");
+            // stmt.run();
+            // stmt.finalize();
+            var i=0;
+            files.forEach(function (file) {
+                if (i>=5)
+                    return;
+                var idfile = getID();
+                ask("INSERT INTO attached (id,path,message,type) VALUES ('" + idfile + "','" + file.path.replace('static\\','') + "','" + id + "','"+file.mimetype.split("/")[0]+"')");
+                i++;
+            });      
             res.end("File caricato");
         }catch(e){
             var a=0;
@@ -91,37 +110,27 @@ var indexPage, movie_webm, movie_mp4, movie_ogg;
 
 io.on('connection', function (socket) {
     socket.on('home',function(){
-        var sqlite3 = sql.verbose();
-        var db = new sqlite3.Database('database.db');
-        db.serialize(function () {
-
-            db.each("SELECT * FROM message;",function(err,row){
-                if (err)
-                    return;
-                var image="";
-                if (row.clicked==1 && row.image!=null)
-                    image="images/"+row.id+".jpg";
-                else
-                    image=require('gravatar').url(row.name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
-                socket.emit('person',{
-                    name:row.name,
-                    id:row.id,
-                    image:image,
-                    clicked:row.clicked==1
-                })
-            });
+        ask("SELECT * FROM message;",function(err,row){
+            if (err)
+                return;
+            var image="";
+            if (row.clicked==1 && row.image!=null)
+                image="images/"+row.id+".jpg";
+            else
+                image=require('gravatar').url(row.name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
+            socket.emit('person',{
+                name:row.name,
+                id:row.id,
+                image:image,
+                clicked:row.clicked==1
+            })
         });
-        db.close();
+        
     });
     socket.on('load',function(data){
-        var sqlite3 = sql.verbose();
-        var db = new sqlite3.Database('database.db');
-        var id = data;
-        
-        db.serialize(function () {
 
-            db.run("UPDATE message SET clicked=1 WHERE id='"+id+"';");
-             db.each("SELECT * FROM message WHERE id='"+id+"';",function(err,row){
+            ask("UPDATE message SET clicked=1 WHERE id='"+id+"';");
+            ask("SELECT * FROM message WHERE id='"+id+"';",function(err,row){
                 if (err)
                     return;
                 var image="images/"+row.id+".jpg";
@@ -133,12 +142,11 @@ io.on('connection', function (socket) {
                     id:row.id,
                     image:image,
                     message:row.message,
-                    time:row.time
+                    time:row.timestap
                 });
-                var d = new sqlite3.Database('database.db');
                 
-                d.serialize(function () {
-                    d.each("SELECT * FROM attached WHERE message='"+id+"';",function(err,img){
+                ask("SELECT * FROM attached WHERE message='"+id+"';",function(err,imgs){
+                    imgs.forEach(function (img) {
                         if (err)
                             return;
                         if (img.type=="image")
@@ -150,16 +158,13 @@ io.on('connection', function (socket) {
                             id:row.id,
                             image:image,
                             source:img.path,
-                            time:row.time
+                            time:row.timestap
                         })
-                        
-                    });
+                    };
                 });
-                d.close();   
             });
-
+                
         });
-        db.close();
     });
 
 });
