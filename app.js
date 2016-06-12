@@ -71,7 +71,7 @@ var upload = multer({storage: storage}).array('userPhoto',12);
 app.post('/photo', function (req, res) {
     upload(req, res, function (err) {
         if (err) {
-            return res.end("C'è stato un errore nel caricamento, ricarica la pagina e riprova");
+            return res.end(err+" C'è stato un errore nel caricamento, ricarica la pagina e riprova");
         }
         try {
             var id = getID();
@@ -91,7 +91,7 @@ app.post('/photo', function (req, res) {
             });      
             res.end("File caricato");
         }catch(e){
-            var a=0;
+            return res.end(e+" C'è stato un errore nel caricamento, ricarica la pagina e riprova");
         }
     });
 });
