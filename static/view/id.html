@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html">
+    <title>Messaggi</title>
+    <meta name="author" content="Francesco Zanoli">
+    <link rel="apple-touch-icon" sizes="57x57" href="images/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="images/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="images/favicon-194x194.png" sizes="194x194">
+    <link rel="icon" type="image/png" href="images/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="images/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="images/manifest.json">
+    <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" type="text/css" media="all" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" media="all" href="css/chat.css">
+    <link rel="stylesheet" type="text/css" media="all" href="css/switchery.min.css">
+    <link rel="stylesheet" type="text/css" media="all" href="css/ratchet.css">
+    <script type="text/javascript" src="js/switchery.min.js"></script>
+    <script type="text/javascript" src="js/ratchet.js"></script>
+</head>
+
+<body>
+<div>
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<header class="bar bar-nav">
+  <a class="icon icon-left-nav pull-left" onclick="back()"></a>
+  <h1 class="title h3" id="Name"></h1>
+</header>
+<div class="container">
+    <div class="col-md-12 col-lg-6">
+        <div class="panel">
+            <!--Heading-->
+    
+            <!--Widget body-->
+            <div id="demo-chat-body" class="collapse in">
+                <div class="scroll">
+                    <div class="nano-content pad-all" tabindex="0" style="right: -17px;">
+                        <ul id="messages" class="no-point list-unstyled media-block">
+                        </ul>
+                    </div>
+                    <div class="nano-pane">
+                        <div class="nano-slider" style="height: 141px; transform: translate(0px, 0px);">
+                            <textarea style="margin:20px;width: 96%; height: 118px;"></textarea>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script id="message" type="text/x-handlebars-template">
+    <li class="mar-btm">
+        <div class="media-left">
+            <img src="{{image}}" class="img-circle img-sm" alt="Profile Picture">
+        </div>
+        <div class="media-body pad-hor">
+            <div class="speech">
+                <a href="#" class="h3 media-heading">{{name}}</a>
+                <p class="h4">{{message}}</p>
+                <p class="speech-time">
+                    <i class="fa fa-clock-o fa-fw"></i> {{time}}
+                </p>
+            </div>
+        </div>
+    </li>
+</script>
+<script id="image" type="text/x-handlebars-template">
+    <li class="mar-btm">
+        <div class="media-left">
+            <img src="{{image}}" class="img-circle img-sm" alt="Profile Picture">
+        </div>
+        <div class="media-body pad-hor">
+            <div class="speech">
+                <a href="#" class="h3 media-heading">{{name}}</a>
+                <img src="{{source}}" style="max-width: 500px;">
+                <p class="speech-time">
+                    <i class="fa fa-clock-o fa-fw"></i> {{time}}
+                </p>
+            </div>
+        </div>
+    </li>
+</script>
+<script id="video" type="text/x-handlebars-template">
+    <li class="mar-btm">
+        <div class="media-left">
+            <img src="{{image}}" class="img-circle img-sm" alt="Profile Picture">
+        </div>
+        <div class="media-body pad-hor">
+            <div class="speech">
+                <a href="#" class="h3 media-heading">{{name}}</a>
+                <video controls style="max-width: 500px;">
+                    <source src="{{source}}" type="video/mp4"/>
+                    <!-- fallback -->
+                    Your browser does not support the <code>video</code> element.
+                </video>
+                <p class="speech-time">
+                    <i class="fa fa-clock-o fa-fw"></i> {{time}}
+                </p>
+            </div>
+        </div>
+    </li>
+</script>
+<script type="text/javascript">
+    var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+
+    elems.forEach(function (html) {
+        var switchery = new Switchery(html);
+    });
+    function back(){
+        window.location.href='/';
+    }
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/handlebars.min.js"></script>
+<script type="text/javascript">
+    socket = io.connect('/');
+    socket.emit('load', window.location.pathname.match(/\/([^/]*)$/)[1]);
+    socket.on('friend', function(data){
+        document.title =data.name;
+        $('#Name').text(data.name);
+        var template = Handlebars.compile($("#message").html());
+        var context = {
+            image: data.image,
+            name: data.name,
+            id: data.id,
+            message:data.message,
+            time:data.time
+        };
+        $('#messages').append(template(context));
+        
+    });
+    socket.on('image', function(data){
+        var template = Handlebars.compile($("#image").html());
+        var context = {
+            image: data.image,
+            name: data.name,
+            id: data.id,
+            source:data.source,
+            message:data.message,
+            time:data.time
+        };
+        $('#messages').append(template(context));
+        
+    });
+    socket.on('video', function(data){
+        var template = Handlebars.compile($("#video").html());
+        var context = {
+            image: data.image,
+            name: data.name,
+            id: data.id,
+            source:data.source,
+            message:data.message,
+            time:data.time
+        };
+        $('#messages').append(template(context));
+        
+    });
+</script>
+</body>
+</html>
