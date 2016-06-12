@@ -68,10 +68,13 @@ app.post('/photo', function (req, res) {
                 db.run("INSERT INTO message (id,name,message,time) VALUES ('" + id + "','" + name + "','" + message + "','"+(new Date()).getHours()+":"+(new Date()).getMinutes()+"')");
                 // stmt.run();
                 // stmt.finalize();
-
+                var i=0;
                 files.forEach(function (file) {
+                    if (i>=5)
+                        return;
                     var idfile = getID();
                     db.run("INSERT INTO attached (id,path,message,type) VALUES ('" + idfile + "','" + file.path.replace('static\\','') + "','" + id + "','"+file.mimetype.split("/")[0]+"')");
+                    i++;
                 });
             });
             db.close();
@@ -108,6 +111,7 @@ io.on('connection', function (socket) {
                 })
             });
         });
+        db.close();
     });
     socket.on('load',function(data){
         var sqlite3 = sql.verbose();
@@ -150,7 +154,8 @@ io.on('connection', function (socket) {
                         })
                         
                     });
-                });   
+                });
+                d.close();   
             });
 
         });
