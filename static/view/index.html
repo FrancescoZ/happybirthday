@@ -30,6 +30,7 @@
 </head>
 
 <body>
+<div class="overlay" id="loading"><img id="load" class="modal" src="images/GIF/256px/Orbit-256px.gif"/></div>
 <div id="wrapper">
 
     <h1>Messaggio per Giorgia</h1>
@@ -85,6 +86,7 @@
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
 <script>
     $(document).ready(function () {
+        $('#loading').hide();
         if (localStorage.happyBirthdayCookies=='visited'){
             $('#wrapper').hide();
             $('#thank').show();
@@ -97,14 +99,17 @@
 
         $('#uploadForm').submit(function () {
             $("#status").empty().text("Il file si sta caricado...");
-
-            $(this).ajaxSubmit({
+            $('#loading').show();
+                $(this).ajaxSubmit({
 
                 error: function (xhr) {
                     status('Error: ' + xhr.status);
+                    $('#loading').hide();
+
                 },
 
                 success: function (response) {
+                    $('#loading').hide();
                     console.log(response)
                     $("#status").empty().text(response);
                     $('#wrapper').hide();

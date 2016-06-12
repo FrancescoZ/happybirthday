@@ -28,14 +28,19 @@
     <link rel="stylesheet" type="text/css" media="all" href="css/chat.css">
     <link rel="stylesheet" type="text/css" media="all" href="css/switchery.min.css">
     <script type="text/javascript" src="js/switchery.min.js"></script>
+    <script type="text/javascript">
+        if (localStorage.password!="ok")
+             window.location.href="login";
+    </script>
 </head>
 
 <body>
+<div class="overlay" id="load"><img class="modal" src="images/GIF/256px/Orbit-256px.gif"/></div>
+
 <h1>Auguri!</h1><br/>
 <h3>Anche quest'anno le persone che ti vogliono bene hanno cercato di fare di tutto per farti sentire quanto sei speciale. Ognuno di loro ha scritto una piccola parte di questo "libro" che potra accompagnarti ovunque tu vada</h3>
 <h3>Ti vogliamo bene!</h3>
 <div id="wrapper" class="form">
-
 </div>
 
 <script id="person" type="text/x-handlebars-template" >
@@ -60,8 +65,6 @@
     elems.forEach(function (html) {
         var switchery = new Switchery(html);
     });
-    if (localStorage.password!="ok")
-         window.location.href="login";
 </script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
@@ -71,6 +74,7 @@
     socket = io.connect('/');
     socket.emit('home');
     socket.on('person', function(data){
+        $('#load').hide()
         if (data.clicked)
             var template = Handlebars.compile($("#person").html());
         else

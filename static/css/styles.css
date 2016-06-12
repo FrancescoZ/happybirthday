@@ -88,6 +88,27 @@ h3 {
     color: #555;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+  background-color: rgba(0,0,0,0.5);
+}
+.modal {
+    line-height: 200px;
+    position: fixed;
+    top: 50%; 
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -150px;
+    text-align: center;
+    z-index: 11; /* 1px higher than the overlay layer */
+}
+
+
 div.img {
     height:180px;
     left:-50%; right:-50%; top:0;

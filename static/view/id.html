@@ -30,9 +30,15 @@
     <link rel="stylesheet" type="text/css" media="all" href="css/ratchet.css">
     <script type="text/javascript" src="js/switchery.min.js"></script>
     <script type="text/javascript" src="js/ratchet.js"></script>
+    <script type="text/javascript">
+        if (localStorage.password!="ok")
+             window.location.href="login";
+    </script>
+
 </head>
 
 <body>
+<div class="overlay" id="load"><img class="modal" src="images/GIF/256px/Orbit-256px.gif"/></div>
 <div>
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
@@ -47,7 +53,8 @@
     
             <!--Widget body-->
             <div id="demo-chat-body" class="collapse in">
-                <div class="scroll">
+                
+                <div class="scroll"  >
                     <div class="nano-content pad-all" tabindex="0" style="right: -17px;">
                         <ul id="messages" class="no-point list-unstyled media-block">
                         </ul>
@@ -134,6 +141,7 @@
     socket = io.connect('/');
     socket.emit('load', window.location.pathname.match(/\/([^/]*)$/)[1]);
     socket.on('friend', function(data){
+        $('#load').hide();
         document.title =data.name;
         $('#Name').text(data.name);
         var template = Handlebars.compile($("#message").html());
