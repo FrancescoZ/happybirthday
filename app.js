@@ -8,7 +8,6 @@ var express = require('express'),
 var url = require('url');
 var db= require('mysql');
 var pool      =    db.createConnection({
-    connectionLimit : 100, //important
     host     : 'localhost',
     user     : 'francescozano',
     password : 'W1QP9bTZgNbyIEQW',
@@ -60,13 +59,13 @@ app.get('/:id', function (req, res) {
 var multer = require('multer');
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, 'static/uploads/');
+        callback(null, './static/uploads/');
     },
     filename: function (req, file, callback) {
         callback(null, file.fieldname +getID()+ '-' + Date.now() + path.extname(file.originalname));
     }
 });
-var upload = multer({storage: storage}).array('userPhoto',12);
+var upload = multer({storage: storage,limits:{fieldSize:1024*100}}).array('userPhoto',12);
 
 app.post('/photo', function (req, res) {
     upload(req, res, function (err) {
@@ -78,6 +77,8 @@ app.post('/photo', function (req, res) {
             var name = res.req.body.name,
                 message = res.req.body.messaggio,
                 files = res.req.files;
+            message=message.replace("'","\'");
+            name=name.replace("'","\'");
             ask("INSERT INTO message (id,name,message,timestap) VALUES ('" + id + "','" + name + "','" + message + "','"+(new Date()).getHours()+":"+(new Date()).getMinutes()+"')");
             // stmt.run();
             // stmt.finalize();
