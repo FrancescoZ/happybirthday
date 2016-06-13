@@ -147,7 +147,7 @@ io.on('connection', function (socket) {
                         name:row.name,
                         id:row.id,
                         image:image,
-                        source:img.path,
+                        source:img.path.replace('static\\',''),
                         time:row.timestap
                     });
                 });
