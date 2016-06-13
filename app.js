@@ -99,12 +99,12 @@ app.post('/photo', function (req, res) {
 
 var indexPage, movie_webm, movie_mp4, movie_ogg;
 
-
-
 io.on('connection', function (socket) {
     socket.on('home',function(){
         ask("SELECT * FROM message;",function(rows){
             var row=rows[0];
+            if (!row)
+                return;
             var name=row.name;
             var image="";
             if (row.clicked==1 && row.image!=null)
