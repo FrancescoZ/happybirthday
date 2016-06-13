@@ -87,7 +87,7 @@ app.post('/photo', function (req, res) {
                 if (i>=5)
                     return;
                 var idfile = getID();
-                ask("INSERT INTO attached (id,path,message,type) VALUES ('" + idfile + "','" + file.path.replace('static\\','') + "','" + id + "','"+file.mimetype.split("/")[0]+"')");
+                ask("INSERT INTO attached (id,path,message,type) VALUES ('" + idfile + "','" + file.path.replace('static/','') + "','" + id + "','"+file.mimetype.split("/")[0]+"')");
                 i++;
             });      
             res.end("File caricato");
@@ -102,23 +102,21 @@ var indexPage, movie_webm, movie_mp4, movie_ogg;
 io.on('connection', function (socket) {
     socket.on('home',function(){
         ask("SELECT * FROM message;",function(rows){
-            var row=rows[0];
-            if (!row)
-                return;
-            var name=row.name;
-            var image="";
-            if (row.clicked==1 && row.image!=null)
-                image="images/"+row.id+".jpg";
-            else
-                image=require('gravatar').url(name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
-            socket.emit('person',{
-                name:row.name,
-                id:row.id,
-                image:image,
-                clicked:row.clicked==1
-            })
+            rows.forEach(function (row) {
+                var name=row.name;
+                var image="";
+                if (row.clicked==1 && row.image!=null)
+                    image="images/"+row.id+".jpg";
+                else
+                    image=require('gravatar').url(name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
+                socket.emit('person',{
+                    name:row.name,
+                    id:row.id,
+                    image:image,
+                    clicked:row.clicked==1
+                })
+            });
         });
-        
     });
     socket.on('load',function(data){
         var id=data;
@@ -147,7 +145,7 @@ io.on('connection', function (socket) {
                         name:row.name,
                         id:row.id,
                         image:image,
-                        source:img.path.replace('static\\',''),
+                        source:img.path.replace("static/",""),
                         time:row.timestap
                     });
                 });
