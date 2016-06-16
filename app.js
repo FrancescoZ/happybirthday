@@ -106,7 +106,7 @@ io.on('connection', function (socket) {
                 var name=row.name;
                 var image="";
                 if (row.clicked==1 && row.image!=null)
-                    image="images/"+row.id+".jpg";
+                    image="images/"+row.id+".JPG";
                 else
                     image=require('gravatar').url(name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
                 socket.emit('person',{
@@ -123,7 +123,7 @@ io.on('connection', function (socket) {
         ask("UPDATE message SET clicked=1 WHERE id='"+id+"';");
         ask("SELECT * FROM message WHERE id='"+id+"';",function(rows){
             var row=rows[0];
-            var image="images/"+row.id+".jpg";
+            var image="images/"+row.id+".JPG";
             if (row.image==null)
                 image=require('gravatar').url(row.name.replace(/\s/g, '')+'@gmail.com', {s: '200', d: 'identicon'});
 
