@@ -29,8 +29,6 @@
     <link rel="stylesheet" type="text/css" media="all" href="css/chat.css">
     <link rel="stylesheet" type="text/css" media="all" href="css/switchery.min.css">
     <link rel="stylesheet" type="text/css" media="all" href="css/ratchet.css">
-    <script type="text/javascript" src="js/switchery.min.js"></script>
-    <script type="text/javascript" src="js/ratchet.js"></script>
     <script type="text/javascript">
         if (localStorage.password!="ok")
              window.location.href="login";
@@ -40,7 +38,12 @@
 
 <body>
 <div class="overlay" id="load"><img class="modal" src="images/GIF/256px/Orbit-256px.gif"/></div>
-<div>
+<div class="overlay" id="imgoverlay" style="display:flex;justify-content:center;align-items:center;width:100%;height:100%;">
+  <div >
+        <img class="imgmodal"  id="imgshow" src=""/></div>
+  </div>
+</div>
+
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 <header class="bar bar-nav">
@@ -96,7 +99,9 @@
         <div class="media-body pad-hor">
             <div class="speech">
                 <a href="#" class="h3 media-heading">{{name}}</a>
-                <img src="{{source}}" style="max-width: 100%;">
+                <a id="{{id}}">
+                    <img src="{{source}}" style="max-width: 100%;">
+                </a>
                 <p class="speech-time">
                     <i class="fa fa-clock-o fa-fw"></i> {{time}}
                 </p>
@@ -126,7 +131,7 @@
 </script>
 <script type="text/javascript">
     var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
-
+    
     elems.forEach(function (html) {
         var switchery = new Switchery(html);
     });
@@ -140,9 +145,14 @@
 <script src="js/handlebars.min.js"></script>
 <script type="text/javascript">
     socket = io.connect('/');
+    $('#imgoverlay').hide();
+    $('#imgoverlay').on('click',function(e){
+        $('#imgoverlay').hide();
+    });
     socket.emit('load', window.location.pathname.match(/\/([^/]*)$/)[1]);
     socket.on('friend', function(data){
         $('#load').hide();
+
         document.title =data.name;
         $('#Name').text(data.name);
         var template = Handlebars.compile($("#message").html());
@@ -167,7 +177,10 @@
             time:data.time
         };
         $('#messages').append(template(context));
-        
+        $('#'+data.id).on('click',function(e){
+            $('#imgshow').attr("src", data.source);
+            $('#imgoverlay').show();
+        });
     });
     socket.on('video', function(data){
         var template = Handlebars.compile($("#video").html());
@@ -183,5 +196,8 @@
         
     });
 </script>
+<script type="text/javascript" src="js/switchery.min.js"></script>
+<script type="text/javascript" src="js/ratchet.js"></script>
+
 </body>
 </html>

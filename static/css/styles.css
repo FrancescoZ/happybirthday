@@ -107,6 +107,16 @@ h3 {
     text-align: center;
     z-index: 11; /* 1px higher than the overlay layer */
 }
+.imgmodal {
+    max-width: 100%;
+    max-height: 100%;
+    line-height: 200px;
+    position: relative;
+    text-align: center;
+    z-index: 11; /* 1px higher than the overlay layer */
+}
+
+
 
 
 div.img {
@@ -135,7 +145,7 @@ div.img:hover {
 
 div.img img {
     width: 100%;
-    height: auto;
+    height: 100%;
 }
 
 div.desc {

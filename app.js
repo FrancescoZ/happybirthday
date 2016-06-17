@@ -136,6 +136,7 @@ io.on('connection', function (socket) {
             });
             
             ask("SELECT * FROM attached WHERE message='"+id+"';",function(imgs){
+                var i=0;
                 imgs.forEach(function (img) {
                     if (img.type=="image")
                         var signal='image';
@@ -143,11 +144,12 @@ io.on('connection', function (socket) {
                         var signal='video';
                     socket.emit(signal,{
                         name:row.name,
-                        id:row.id,
+                        id:'img'+i,
                         image:image,
                         source:img.path.replace("static/",""),
                         time:row.timestap
                     });
+                    i++;
                 });
             });
         });
