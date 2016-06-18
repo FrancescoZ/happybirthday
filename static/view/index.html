@@ -89,15 +89,8 @@
 <script>
     $(document).ready(function () {
         $('#loading').hide();
-        if (localStorage.happyBirthdayCookies=='visited'){
-            $('#wrapper').hide();
-            $('#thank').show();
-        }
-        else
-        {
             $('#wrapper').show();
             $('#thank').hide();
-        }
 
         $('#uploadForm').submit(function () {
             $("#status").empty().text("Il file si sta caricado...");
@@ -105,7 +98,7 @@
                 $(this).ajaxSubmit({
 
                 error: function (xhr) {
-                    status('Error: ' + xhr.status);
+                    $("#status").empty().text(xhr.status);
                     $('#loading').hide();
 
                 },
@@ -113,10 +106,14 @@
                 success: function (response) {
                     $('#loading').hide();
                     console.log(response)
-                    $("#status").empty().text(response);
-                    $('#wrapper').hide();
-                    $('#thank').show();
-                    localStorage.happyBirthdayCookies='visited'
+                    if (response!="File caricato")
+                        $("#status").empty().text(response.status);
+                    else
+                    {
+                        $("#status").empty().text(response);
+                        $('#wrapper').hide();
+                        $('#thank').show();
+                    }
                 }
             });
             return false;

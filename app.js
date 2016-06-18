@@ -35,8 +35,11 @@ var ask=function(query,callback){
     pool.query(query,function(err,rows){
         if(!err) {
             if (callback)
-                callback(rows);
+                callback(err,rows);
         }
+        else
+            if (callback)
+                callback(err,rows);
     });
 }
 
@@ -77,20 +80,32 @@ app.post('/photo', function (req, res) {
             var name = res.req.body.name,
                 message = res.req.body.messaggio,
                 files = res.req.files;
-            message=message.replace("'","\'");
-            name=name.replace("'","\'");
-            ask("INSERT INTO message (id,name,message,timestap) VALUES ('" + id + "','" + name + "','" + message + "','"+(new Date()).getHours()+":"+(new Date()).getMinutes()+"')");
+            message=message.replace(/\'/g,"\\'");
+            name=name.replace(/\'/g,"\\'");
+            ask("INSERT INTO message (id,name,message,timestap) VALUES ('" + id + "','" + name + "','" + message + "','"+(new Date()).getHours()+":"+(new Date()).getMinutes()+"')",function(err,row){
+                if (err)
+                    return res.end(err+" C'è stato un errore nel caricamento, ricarica la pagina e riprova");
+                var i=0;
+                if (files.length==0)
+                    res.end("File caricato");
+                files.forEach(function (file) {
+                    if (i>=5)
+                        return;
+                    var idfile = getID();
+                    ask("INSERT INTO attached (id,path,message,type) VALUES ('" + idfile + "','" + file.path.replace('static/','') + "','" + id + "','"+file.mimetype.split("/")[0]+"')",function(err,row){
+                            if (!err)
+                                res.end("File caricato");
+                            else
+                                return res.end(err+" C'è stato un errore nel caricamento, ricarica la pagina e riprova");
+                        });
+                        i++;
+                    })});
+                    
+                     
             // stmt.run();
             // stmt.finalize();
-            var i=0;
-            files.forEach(function (file) {
-                if (i>=5)
-                    return;
-                var idfile = getID();
-                ask("INSERT INTO attached (id,path,message,type) VALUES ('" + idfile + "','" + file.path.replace('static/','') + "','" + id + "','"+file.mimetype.split("/")[0]+"')");
-                i++;
-            });      
-            res.end("File caricato");
+
+            
         }catch(e){
             return res.end(e+" C'è stato un errore nel caricamento, ricarica la pagina e riprova");
         }
@@ -101,7 +116,7 @@ var indexPage, movie_webm, movie_mp4, movie_ogg;
 
 io.on('connection', function (socket) {
     socket.on('home',function(){
-        ask("SELECT * FROM message;",function(rows){
+        ask("SELECT * FROM message;",function(err,rows){
             rows.forEach(function (row) {
                 var name=row.name;
                 var image="";
@@ -121,7 +136,7 @@ io.on('connection', function (socket) {
     socket.on('load',function(data){
         var id=data;
         ask("UPDATE message SET clicked=1 WHERE id='"+id+"';");
-        ask("SELECT * FROM message WHERE id='"+id+"';",function(rows){
+        ask("SELECT * FROM message WHERE id='"+id+"';",function(err,rows){
             var row=rows[0];
             var image="images/"+row.id+".JPG";
             if (row.image==null)
@@ -135,7 +150,7 @@ io.on('connection', function (socket) {
                 time:row.timestap
             });
             
-            ask("SELECT * FROM attached WHERE message='"+id+"';",function(imgs){
+            ask("SELECT * FROM attached WHERE message='"+id+"';",function(err,imgs){
                 var i=0;
                 imgs.forEach(function (img) {
                     if (img.type=="image")
