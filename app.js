@@ -89,8 +89,6 @@ app.post('/photo', function (req, res) {
                 if (files.length==0)
                     res.end("File caricato");
                 files.forEach(function (file) {
-                    if (i>=5)
-                        return;
                     var idfile = getID();
                     ask("INSERT INTO attached (id,path,message,type) VALUES ('" + idfile + "','" + file.path.replace('static/','') + "','" + id + "','"+file.mimetype.split("/")[0]+"')",function(err,row){
                             if (!err)
