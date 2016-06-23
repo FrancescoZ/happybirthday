@@ -66,13 +66,13 @@
 </div>
 <div id="thank">
 
-    <h1>Grazie!!!</h1>
+    <h1>Mi dispiace</h1>
 
     <form>
         <div class="col" style="padding:180px;text-align: center;">
             <label style="padding: 0px;
                     margin-left: -50px;">
-                Grazie per aver scritto!
+                Troppo, tardi, scrivi a francesco.zanoli@gmail.com per aggiungere un messaggio
             </label>
         </div>
     </form>
@@ -89,8 +89,9 @@
 <script>
     $(document).ready(function () {
         $('#loading').hide();
-            $('#wrapper').show();
-            $('#thank').hide();
+        $('#thank').show();
+        //    $('#wrapper').show();
+        //    $('#thank').hide();
 
         $('#uploadForm').submit(function () {
             $("#status").empty().text("Il file si sta caricado...");
